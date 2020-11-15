@@ -19,7 +19,7 @@ class Model:
     def generate_df(self, input_file):
         df = pd.read_csv(input_file)
         df["labels"] = df["label"]
-        return df[["text", "labels"]].head(10)
+        return df[["text", "labels"]]
 
     def f1_multiclass(self, labels, preds):
         return f1_score(labels, preds, average="micro")
