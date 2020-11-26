@@ -18,8 +18,17 @@ class Model:
 
     def generate_df(self, input_file):
         df = pd.read_csv(input_file)
+        df = df.head(100)
         df["labels"] = df["label"]
         return df[["text", "labels"]]
+
+    def read_df(self, input_file):
+        df = pd.read_csv(input_file)
+        df["labels"] = df["label"]
+        df = df.drop(['Unnamed: 0'], axis=1)
+        df = df.drop(['label'], axis=1)
+        df = df.head(100)
+        return df
 
     def f1_multiclass(self, labels, preds):
         return f1_score(labels, preds, average="micro")
@@ -65,18 +74,40 @@ class Model:
         )
         print(result)
 
+    def predict(self, test_file, model_type, model_dir, use_cuda=False):
+        self.train_args["output_dir"] = out_dir
+        test_df = self.read_df(test_file)
+        model = ClassificationModel(
+            model_type,
+            f"{model_dir}/",
+            num_labels=4,
+            args=self.train_args,
+            use_cuda=use_cuda,
+        )
+        predictions, raw_outputs = model.predict(test_df['text'].to_list())
+        test_df['predictions'] = predictions
+        test_predictions = test_file[:-4] + "_predictions.csv"
+        write_csv(test_predictions, list(test_df.columns.values), [test_df[column].to_list() for column in list(test_df.columns.values)])
+
+def write_csv(filename, col_names, cols):
+    df = pd.DataFrame(cols)
+    df = df.transpose()
+
+    with open(filename, 'w', encoding='utf-8', newline = '\n') as f:
+            df.to_csv(f, header=col_names)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--train", action="store_true", help="train model")
     parser.add_argument("-e", "--eval", action="store_true", help="eval model")
+    parser.add_argument("-p", "--predict", action="store_true", help="eval model")
     parser.add_argument("--use-cuda", action="store_true", help="Use CUDA for the model")
     parser.add_argument("--model-type", type=str, default="bert")
     parser.add_argument("--model-name", type=str, default="bert-base-multilingual-cased")
 
     args = parser.parse_args()
 
-    if not args.train and not args.eval:
+    if not args.train and not args.eval and not args.predict:
         parser.print_help()
         exit(0)
 
@@ -94,4 +125,10 @@ if __name__ == "__main__":
         for i, train_file in enumerate(train_files):
             print(f"Evaluating {model_type}: {model_name} on {test_files[i]}")
             out_dir = f"{train_file.split('.')[0]}_{model_name}"
-            model.test_model(test_files[i], model_type, args.use_cuda, out_dir, args.use_cuda)
+            model.test_model(test_files[i], model_type, out_dir, args.use_cuda)
+
+    if args.predict:
+        for i, train_file in enumerate(train_files):
+            print(f"Predicting {model_type}: {model_name} on {test_files[i]}")
+            out_dir = f"{train_file.split('.')[0]}_{model_name}"
+            model.predict(test_files[i], model_type, out_dir, args.use_cuda)
