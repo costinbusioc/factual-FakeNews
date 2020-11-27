@@ -86,7 +86,7 @@ class Model:
         )
         predictions, raw_outputs = model.predict(test_df['text'].to_list())
         test_df['predictions'] = predictions
-        test_predictions = test_file[:-4] + "_predictions.csv"
+        test_predictions = f"{test_file[:-4]}_predictions_{model_type}.csv"
         write_csv(test_predictions, list(test_df.columns.values), [test_df[column].to_list() for column in list(test_df.columns.values)])
 
 def write_csv(filename, col_names, cols):
