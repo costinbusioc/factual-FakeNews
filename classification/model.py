@@ -20,7 +20,6 @@ class Model:
 
     def generate_df(self, input_file):
         df = pd.read_csv(input_file)
-        df = df.head(100)
         df["labels"] = df["label"]
         return df[["text", "labels"]]
 
@@ -29,7 +28,6 @@ class Model:
         df["labels"] = df["label"]
         df = df.drop(['Unnamed: 0'], axis=1)
         df = df.drop(['label'], axis=1)
-        df = df.head(100)
         return df
 
     def f1_multiclass(self, labels, preds):
