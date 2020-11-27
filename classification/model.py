@@ -7,13 +7,15 @@ from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_sc
 train_files = ["politifact.csv", "politifact_covid.csv"]
 test_files = ["factual.csv", "factual_covid.csv"]
 
+import torch.multiprocessing
+torch.multiprocessing.set_sharing_strategy('file_system')
 
 class Model:
     def __init__(self):
         self.train_args = {
             "reprocess_input_data": True,
             "fp16": False,
-            "num_train_epochs": 4,
+            "num_train_epochs": 8,
         }
 
     def generate_df(self, input_file):
