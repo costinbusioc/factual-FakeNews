@@ -2,7 +2,7 @@ import argparse
 
 import pandas as pd
 from simpletransformers.classification import ClassificationModel
-from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score
+from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score, classification_report
 
 train_files = ["politifact.csv", "politifact_covid.csv"]
 test_files = ["factual.csv", "factual_covid.csv"]
@@ -88,6 +88,9 @@ class Model:
         test_df['predictions'] = predictions
         test_predictions = f"{test_file[:-4]}_predictions_{model_type}.csv"
         write_csv(test_predictions, list(test_df.columns.values), [test_df[column].to_list() for column in list(test_df.columns.values)])
+
+        print(classification_report(list(test_df["labels"]), predictions, digits=3))
+
 
 def write_csv(filename, col_names, cols):
     df = pd.DataFrame(cols)
