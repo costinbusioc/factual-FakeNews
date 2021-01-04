@@ -2,6 +2,8 @@ import argparse
 
 import pandas as pd
 from simpletransformers.classification import ClassificationModel
+from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score, classification_report
+
 
 folder = "PolitifactDatasets/"
 train_files = [folder + "politifact_train.csv", folder + "politifact_covid_train.csv"]
@@ -30,13 +32,22 @@ class Model:
         df = df.drop(['label'], axis=1)
         return df
 
+    def f1_multiclass(self, labels, preds):
+        return f1_score(labels, preds, average="micro")
+
+    def precision_multiclass(self, labels, preds):
+        return precision_score(labels, preds, average="micro")
+
+    def recall_multiclass(self, labels, preds):
+        return recall_score(labels, preds, average="micro")
+        
     def train_model(self, train_file, model_type, model_name, out_dir=None, use_cuda=False):
         self.train_args["output_dir"] = out_dir
         train_df = self.generate_df(train_file)
         model = ClassificationModel(
             model_type,
             model_name,
-            num_labels=2,
+            num_labels=4,
             args=self.train_args,
             use_cuda=use_cuda,
         )
@@ -52,12 +63,16 @@ class Model:
         model = ClassificationModel(
             model_type,
             f"{model_dir}/",
-            num_labels=2,
+            num_labels=4,
             args=self.train_args,
             use_cuda=use_cuda,
         )
         result, model_outputs, wrong_predictions = model.eval_model(
-            test_df
+            test_df,
+            f1=self.f1_multiclass,
+            acc=accuracy_score,
+            precision=self.precision_multiclass,
+            recall=self.recall_multiclass,
         )
         print(result)
 
