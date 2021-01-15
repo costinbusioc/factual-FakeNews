@@ -7,7 +7,7 @@ df = pd.read_csv(input_file)
 column_names = ["text_size", "subject", "contains_name"]
 
 root = "."
-path = os.path.join(root, "splitted_datasets")
+path = os.path.join(root, "../classification/splitted_datasets")
 if not os.path.exists(path):
     os.mkdir(path)
 
@@ -22,4 +22,5 @@ for column in column_names:
 
         out_file = value + "_" + input_file
 
+        print(out_file)
         filtered_df.to_csv(os.path.join(column_path, out_file))

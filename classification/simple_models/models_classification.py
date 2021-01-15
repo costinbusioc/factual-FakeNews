@@ -11,8 +11,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, classification_report
 
-FILENAME_TRAIN = "politifact.csv"
-FILENAME_TEST = "factual.csv"
+FILENAME_TRAIN = "../politifact.csv"
+FILENAME_TEST = "../factual.csv"
 NEW_FILENAME_TRAIN = "politifact_processed.csv"
 NEW_FILENAME_TEST = "factual_processed.csv"
 MODELS_PATH = "Models/"
