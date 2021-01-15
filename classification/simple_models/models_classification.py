@@ -60,25 +60,7 @@ def print_time(start_time, end_time, process):
 		print ("Timp", process, diff / 60, " secunde")
 
 def get_scores(y_test, predictions):
-	cnf_matrix = confusion_matrix(y_test, predictions)
-	fp = cnf_matrix.sum(axis=0) - np.diag(cnf_matrix)
-	fn = cnf_matrix.sum(axis=1) - np.diag(cnf_matrix)
-	tp = np.diag(cnf_matrix)
-	tn = cnf_matrix.sum() - (fp + fn + tp)
-
 	print ('Accuracy: ', accuracy_score(y_test, predictions))
-	print ('Recall: ', recall_score(y_test, predictions, average='micro'))
-	print ('Precision: ', precision_score(y_test, predictions, average='micro'))
-	print ('F1 score: ', f1_score(y_test, predictions, average='micro'))
-
-	import pdb; pdb.set_trace()
-	print ('Accuracy: ', (tp + tn) / len(predictions))
-	rec = tp/(tp + fn)
-	print ('Recall: ', tp/(tp + fn))
-	prec = tp/(tp + fp)
-	print ('Precision: ', tp/(tp + fp))
-	print ('F1 score: ', 2 * (rec * prec) / (rec + prec))
-
 	return accuracy_score(y_test, predictions)
 
 def get_model(x_train, y_train, x_test, y_test, model_type):
