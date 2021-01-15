@@ -2,6 +2,7 @@ import pandas as pd
 import contractions
 import nltk
 import pickle
+import numpy as np
 import argparse
 import time
 from string import punctuation
@@ -59,7 +60,12 @@ def print_time(start_time, end_time, process):
 		print ("Timp", process, diff / 60, " secunde")
 
 def get_scores(y_test, predictions):
-	tn, fp, fn, tp = confusion_matrix(y_test, predictions)
+	cnf_matrix = confusion_matrix(y_test, predictions)
+	fp = cnf_matrix.sum(axis=0) - np.diag(cnf_matrix)
+	fn = cnf_matrix.sum(axis=1) - np.diag(cnf_matrix)
+	tp = np.diag(cnf_matrix)
+	tn = cnf_matrix.sum() - (fp + fn + tp)
+
 	print ('Accuracy: ', accuracy_score(y_test, predictions))
 	print ('Recall: ', recall_score(y_test, predictions, average='micro'))
 	print ('Precision: ', precision_score(y_test, predictions, average='micro'))
