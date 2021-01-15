@@ -6,7 +6,7 @@ import numpy as np
 from simpletransformers.classification import ClassificationModel
 from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score, confusion_matrix, classification_report
 
-train_file = "../helpers/politifact.csv"
+train_file = "politifact.csv"
 test_directory = "splitted_datasets"
 
 import torch.multiprocessing
