@@ -9,7 +9,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, classification_report
+from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, classification_report, confusion_matrix
 
 FILENAME_TRAIN = "../politifact.csv"
 FILENAME_TEST = "../factual.csv"
@@ -59,10 +59,18 @@ def print_time(start_time, end_time, process):
 		print ("Timp", process, diff / 60, " secunde")
 
 def get_scores(y_test, predictions):
+	tn, fp, fn, tp = confusion_matrix(y_test, predictions)
 	print ('Accuracy: ', accuracy_score(y_test, predictions))
 	print ('Recall: ', recall_score(y_test, predictions, average='micro'))
 	print ('Precision: ', precision_score(y_test, predictions, average='micro'))
 	print ('F1 score: ', f1_score(y_test, predictions, average='micro'))
+
+	print ('Accuracy: ', (tp + tn) / len(predictions))
+	rec = tp/(tp + fn)
+	print ('Recall: ', tp/(tp + fn))
+	prec = tp/(tp + fp)
+	print ('Precision: ', tp/(tp + fp))
+	print ('F1 score: ', 2 * (rec * prec) / (rec + prec))
 
 	return accuracy_score(y_test, predictions)
 
