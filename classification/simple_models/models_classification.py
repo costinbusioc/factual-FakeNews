@@ -65,6 +65,7 @@ def get_scores(y_test, predictions):
 	print ('Precision: ', precision_score(y_test, predictions, average='micro'))
 	print ('F1 score: ', f1_score(y_test, predictions, average='micro'))
 
+	import pdb; pdb.set_trace()
 	print ('Accuracy: ', (tp + tn) / len(predictions))
 	rec = tp/(tp + fn)
 	print ('Recall: ', tp/(tp + fn))
