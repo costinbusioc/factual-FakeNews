@@ -28,7 +28,7 @@ def get_scores(y_test, predictions, f):
     f.write(f"tn: {tn}")
     f.write(f"fp: {fp}")
     f.write(f"fn: {fn}")
-    f.write('Accuracy: ', accuracy_score(y_test, predictions))
+    f.write(f"Accuracy: {accuracy_score(y_test, predictions)}")
 
 
 class Model:
@@ -57,7 +57,7 @@ class Model:
         test_df = self.generate_df(self.test_file, en=True)
 
         folds_dfs = np.array_split(test_df, n_folds)
-        with open(f"test_{self.test_file.txt}", "w") as f:
+        with open(f"test_{os.path.basename(self.test_file)}.txt", "w") as f:
             for index, test_df in enumerate(folds_dfs):
                 print(f"Fold {index}")
                 f.write(f"Fold {index}")
