@@ -12,7 +12,7 @@ test_directory = "splitted_datasets"
 import torch.multiprocessing
 torch.multiprocessing.set_sharing_strategy('file_system')
 
-def get_scores(y_test, predictions):
+def get_scores(y_test, predictions, f):
     cnf_matrix = confusion_matrix(y_test, predictions)
     fp = cnf_matrix.sum(axis=0) - np.diag(cnf_matrix)
     fn = cnf_matrix.sum(axis=1) - np.diag(cnf_matrix)
@@ -24,6 +24,11 @@ def get_scores(y_test, predictions):
     print(f"fp: {fp}")
     print(f"fn: {fn}")
     print('Accuracy: ', accuracy_score(y_test, predictions))
+    f.write(f"tp: {tp}")
+    f.write(f"tn: {tn}")
+    f.write(f"fp: {fp}")
+    f.write(f"fn: {fn}")
+    f.write('Accuracy: ', accuracy_score(y_test, predictions))
 
 
 class Model:
@@ -52,27 +57,31 @@ class Model:
         test_df = self.generate_df(self.test_file, en=True)
 
         folds_dfs = np.array_split(test_df, n_folds)
-        for index, test_df in enumerate(folds_dfs):
-            print(f"Fold {index}")
-            train_df = pd.concat([politifact_df] + folds_dfs[0:index] + folds_dfs[(index + 1):n_folds])
-            out_dir = str(index) + "_" + self.test_file
+        with open(f"test_{self.test_file.txt}", "w") as f:
+            for index, test_df in enumerate(folds_dfs):
+                print(f"Fold {index}")
+                f.write(f"Fold {index}")
 
-            model = ClassificationModel(
-                model_type,
-                model_name,
-                num_labels=4,
-                args=self.train_args,
-                use_cuda=use_cuda,
-            )
+                train_df = pd.concat([politifact_df] + folds_dfs[0:index] + folds_dfs[(index + 1):n_folds])
+                out_dir = str(index) + "_" + self.test_file
 
-            model.train_model(
-                train_df,
-                output_dir=out_dir,
-            )
+                model = ClassificationModel(
+                    model_type,
+                    model_name,
+                    num_labels=4,
+                    args=self.train_args,
+                    use_cuda=use_cuda,
+                )
 
-            predictions, raw_outputs = model.predict(test_df['text'].to_list())
-            get_scores(test_df["labels"], predictions)
-            print(classification_report(list(test_df["labels"]), predictions, digits=3))
+                model.train_model(
+                    train_df,
+                    output_dir=out_dir,
+                )
+
+                predictions, raw_outputs = model.predict(test_df['text'].to_list())
+                get_scores(test_df["labels"], predictions, f)
+                print(classification_report(list(test_df["labels"]), predictions, digits=3))
+                f.write(classification_report(list(test_df["labels"]), predictions, digits=3))
 
 
     def f1_multiclass(self, labels, preds):
