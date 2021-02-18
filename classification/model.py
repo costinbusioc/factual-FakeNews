@@ -4,8 +4,8 @@ import pandas as pd
 from simpletransformers.classification import ClassificationModel
 from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score, classification_report
 
-train_files = ["politifact.csv", "politifact_covid.csv"]
-test_files = ["factual.csv", "factual_covid.csv"]
+train_files = ["FactualDatasets/politifact_factual_train.csv"]
+test_files = ["FactualDatasets/factual_test_5.csv"]
 
 import torch.multiprocessing
 torch.multiprocessing.set_sharing_strategy('file_system')
