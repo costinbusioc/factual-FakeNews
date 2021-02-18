@@ -106,7 +106,7 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--predict", action="store_true", help="eval model")
     parser.add_argument("--use-cuda", action="store_true", help="Use CUDA for the model")
     parser.add_argument("--model-type", type=str, default="bert")
-    parser.add_argument("--model-name", type=str, default="bert-base-multilingual-cased")
+    parser.add_argument("--model-name", type=str, default="bert-base-cased")
 
     args = parser.parse_args()
 
