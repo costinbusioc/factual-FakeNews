@@ -6,6 +6,7 @@ from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_sc
 
 train_files = ["FactualDatasets/politifact_factual_train.csv"]
 test_files = ["FactualDatasets/factual_test_5.csv"]
+class_weights = "_politifactfactual_factual"
 
 import torch.multiprocessing
 torch.multiprocessing.set_sharing_strategy('file_system')
@@ -46,6 +47,7 @@ class Model:
             model_type,
             model_name,
             num_labels=4,
+            weight=[0.5, 1, 1, 0.5],
             args=self.train_args,
             use_cuda=use_cuda,
         )
@@ -122,16 +124,19 @@ if __name__ == "__main__":
         for train_file in train_files:
             print(f"Training {model_type}: {model_name} on {train_file}")
             out_dir = f"{train_file.split('.')[0]}_{model_name}"
+            out_dir += class_weights
             model.train_model(train_file, model_type, model_name, out_dir, args.use_cuda)
 
     if args.eval:
         for i, train_file in enumerate(train_files):
             print(f"Evaluating {model_type}: {model_name} on {test_files[i]}")
             out_dir = f"{train_file.split('.')[0]}_{model_name}"
+            out_dir += class_weights
             model.test_model(test_files[i], model_type, out_dir, args.use_cuda)
 
     if args.predict:
         for i, train_file in enumerate(train_files):
             print(f"Predicting {model_type}: {model_name} on {test_files[i]}")
             out_dir = f"{train_file.split('.')[0]}_{model_name}"
+            out_dir += class_weights
             model.predict(test_files[i], model_type, out_dir, args.use_cuda)
