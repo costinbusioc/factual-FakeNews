@@ -43,9 +43,8 @@ for i, statement in enumerate(statements):
     current_verificare = []
     current_resources = []
 
-    if not paragraphs:
-        verificare_1.append("")
-        verificate_last.append("")
+    curr_ver_1 = " "
+    curr_ver_last = " "
 
     for j, p in enumerate(paragraphs):
         if j == 0:
@@ -55,10 +54,10 @@ for i, statement in enumerate(statements):
         current_verificare.append(p.text)
 
         if j == 1:
-            verificare_1.append(p.text)
+            curr_ver_1 = p.text
 
         if j == len(paragraphs) - 1:
-            verificate_last.append(p.text)
+            curr_ver_last = p.text
 
     for resource in verificare_section.find_all("a"):
         current_resources.append(resource["href"])
@@ -67,16 +66,18 @@ for i, statement in enumerate(statements):
     authors.append(author)
     texts.append(text)
     labels.append(label)
+    verificare_1.append(curr_ver_1)
+    verificate_last.append(curr_ver_last)
 
     if current_verificare:
         verificare.append("\n\n".join(current_verificare))
     else:
-        verificare.append("")
+        verificare.append(" ")
 
     if current_resources:
         resources.append("\n\n".join(current_resources))
     else:
-        resources.append("")
+        resources.append(" ")
 
     print(verificare_1)
     print(verificate_last)
