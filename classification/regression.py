@@ -118,9 +118,6 @@ def main():
         with open(model_name, "rb") as file:
             reg = pickle.load(file)
         predictions = reg.predict(features)
-        for index in range(len(predictions)):
-            print("Predictie: ", predictions[index])
-            print("Real: ", labels[index])
         score = mean_squared_error(labels, predictions)
         print("Mean squarred error test: ", score)
 

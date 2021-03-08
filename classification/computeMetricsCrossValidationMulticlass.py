@@ -255,17 +255,17 @@ factual_cu_nume = [
 ]
 
 datasets = {
-	# "factual_social": [factual_social, "Categorie: social"],
-	# "factual_economie": [factual_economie, "Categorie: economie"],
-	# "factual_politica": [factual_politica, "Categorie: politica"],
-	# "factual_externe": [factual_externe, "Categorie: externe"],
-	# "factual_coronavirus": [factual_coronavirus, "Categorie: coronavirus"],
-	# "factual_justitie": [factual_justitie, "Categorie: justitie"],
-	# "factual_sanatate_mediu": [factual_sanatate_mediu, "Categorie: SanatateMediu"],
-	"factual_texte_mici": [factual_texte_mici, "Texte scurte"],
-	"factual_texte_mari": [factual_texte_mari, "Texte lungi"],
-	"factual_cu_nume": [factual_cu_nume, "Afirmatii care contin nume de persoana sau organizatie"],
-	"factual_fara_nume": [factual_fara_nume, "Afirmatii care nu contin nume de persoana sau organizatie" ]
+	"factual_social": [factual_social, "Category: Social"],
+	"factual_economie": [factual_economie, "Category: Economics"],
+	"factual_politica": [factual_politica, "Category: Politcs"],
+	"factual_externe": [factual_externe, "Category: International"],
+	"factual_coronavirus": [factual_coronavirus, "Category: Coronavirus"],
+	"factual_justitie": [factual_justitie, "Category: Justice"],
+	"factual_sanatate_mediu": [factual_sanatate_mediu, "Category: Health"],
+	"factual_texte_mici": [factual_texte_mici, "Short statements"],
+	"factual_texte_mari": [factual_texte_mari, "Long statements"],
+	"factual_cu_nume": [factual_cu_nume, "Statements containing at least one name of person/organization"],
+	"factual_fara_nume": [factual_fara_nume, "Statements not containing any name of person/organization" ]
 }
 
 def convert_label_int_to_str(label):
@@ -347,7 +347,7 @@ def compute_scores(tp, tn, fp, fn, support, no_classes):
 			precision[key] = tp[key] / (tp[key] + fp[key])
 		else:
 			precision[key] = 0
-		if tp[key] + fn[key] != 0:	
+		if tp[key] + fn[key] != 0:
 			recall[key] = tp[key] / (tp[key] + fn[key])
 		else:
 			recall[key] = 0
@@ -370,7 +370,7 @@ def compute_scores(tp, tn, fp, fn, support, no_classes):
 	weighted_avg["f1_score"] = sum([f1_score[key] * support[key] for key in precision.keys()]) / total
 
 	accuracy = sum([tp[key] for key in precision.keys()]) / total
-	
+
 	return accuracy, macro_avg, weighted_avg, precision, recall, f1_score
 
 def run_statistics(dataset):
@@ -397,7 +397,7 @@ def run_statistics(dataset):
 	for key in tp.keys():
 		print("" + key + "               " + str(format(round(precision[key], 3), ".3f")) + "    " + \
 			str(format(round(recall[key], 3), ".3f")) + "      " + \
-			str(format(round(f1_score[key], 3), ".3f")) + "      " + 
+			str(format(round(f1_score[key], 3), ".3f")) + "      " +
 			str(support[key]) + " ")
 
 	print ("Accuracy:", accuracy)
@@ -434,7 +434,7 @@ def run_statistics(dataset):
 	for key in keys_list:
 		new_macro_avg[key] = sum([x[key] for x in macro_avg_list]) / 10
 		new_weighted_avg[key] = sum([x[key] for x in weighted_avg_list]) / 10
-	
+
 	print ("macro avg:", new_macro_avg)
 	print ("weighted avg:", new_weighted_avg)
 
