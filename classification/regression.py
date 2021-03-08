@@ -20,10 +20,7 @@ def read_dataframe(input_file):
 
 
 def get_features(statements, first_validation_pars=None, last_validation_pars=None):
-    tokenizer = BertTokenizer.from_pretrained("readerbench/RoBERT-base")
-    model = BertModel.from_pretrained("readerbench/RoBERT-base")
-
-    bert_wrapper = BertWrapper(Lang.RO, max_seq_len=128)
+    bert_wrapper = BertWrapper(Lang.RO, max_seq_len=128, custom_model=True)
     inputs, bert_output = bert_wrapper.create_inputs_and_model()
     cls_output = bert_wrapper.get_output(bert_output, "cls")
 
@@ -46,7 +43,8 @@ def get_features(statements, first_validation_pars=None, last_validation_pars=No
         for index in range(len(statements)):
             articles.append(statements[index])
 
-    return bert_wrapper.process_input(articles)
+    feed_inputs = bert_wrapper.process_input(articles)
+    return model.predict(feed_inputs, batch_size=32)
 
 def main():
     parser = argparse.ArgumentParser()
