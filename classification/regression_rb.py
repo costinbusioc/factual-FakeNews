@@ -72,8 +72,8 @@ def run_bert_rb(
     model.fit(feed_inputs_train, np.asarray(labels_train))
 
     result = model.predict(feed_inputs_test, batch_size=32)
-    print(result)
     print(f"Mean squared error test: {mean_squared_error(result, labels_test)}")
+    print(model.evaluate(feed_inputs_test, labels_test))
 
 def main():
     parser = argparse.ArgumentParser()
