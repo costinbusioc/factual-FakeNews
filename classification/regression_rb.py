@@ -14,6 +14,20 @@ def read_dataframe(input_file):
     dataframe = dataframe.drop(["Unnamed: 0", "Unnamed: 0.1"], axis=1)
     return dataframe
 
+def convert_labels_for_regression(labels):
+    reg_labels = []
+    for l in labels:
+        if l == 0:
+            reg_labels.append(0)
+        elif l == 1:
+            reg_labels.append(0.33)
+        elif l == 2:
+            reg_labels.append(0.66)
+        else:
+            reg_labels.append(1)
+
+    return reg_labels
+
 def statements_to_list(statements, firs_validation, last_validation):
     articles = []
     if firs_validation and last_validation:
@@ -84,32 +98,12 @@ def main():
     statements_train = dataframe_train["text"].tolist()
     first_validation_pars_train = dataframe_train["first_validation_par"].tolist()
     last_validation_pars_train = dataframe_train["last_validation_par"].tolist()
-    label = dataframe_train["label"]
-    labels_train = []
-    for l in label:
-        if l == 0:
-            labels_train.append(0)
-        elif l == 1:
-            labels_train.append(0.33)
-        elif l == 2:
-            labels_train.append(0.66)
-        else:
-            labels_train.append(1)
+    labels_train = convert_labels_for_regression(dataframe_train["label"])
 
     statements_test = dataframe_test["text"].tolist()
     first_validation_pars_test = dataframe_test["first_validation_par"].tolist()
     last_validation_pars_test = dataframe_test["last_validation_par"].tolist()
-    label = dataframe_test["label"]
-    labels_test = []
-    for l in label:
-        if l == 0:
-            labels_test.append(0)
-        elif l == 1:
-            labels_test.append(0.33)
-        elif l == 2:
-            labels_test.append(0.66)
-        else:
-            labels_test.append(1)
+    labels_test = convert_labels_for_regression(dataframe_test["label"])
 
     run_bert_rb(
         statements_train,
