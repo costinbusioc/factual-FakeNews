@@ -1,7 +1,4 @@
 from rb.processings.encoders.bert import BertWrapper, Lang
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
-import pickle
 import argparse
 import pandas as pd
 from tensorflow import keras
@@ -17,6 +14,22 @@ def read_dataframe(input_file):
     dataframe = dataframe.drop(["Unnamed: 0", "Unnamed: 0.1"], axis=1)
     return dataframe
 
+def statements_to_list(statements, firs_validation, last_validation):
+    articles = []
+    if firs_validation and last_validation:
+        for index in range(len(statements)):
+            article = statements[index]
+            context = ""
+            if isinstance(firs_validation[index], str):
+                context += f"{firs_validation[index]} "
+            if isinstance(last_validation[index], str):
+                context += last_validation[index]
+            articles.append((article, context))
+    else:
+        for index in range(len(statements)):
+            articles.append(statements[index])
+
+    return articles
 
 def run_bert_rb(
         statements_train,
@@ -37,43 +50,17 @@ def run_bert_rb(
     model.compile(loss='mean_squared_error')
     bert_wrapper.load_weights()
 
-    articles_train = []
-    if first_validation_pars_train and last_validation_pars_train:
-        for index in range(len(statements_train)):
-            article = statements_train[index]
-            context = ""
-            if isinstance(first_validation_pars_train[index], str):
-                context += f"{first_validation_pars_train[index]} "
-            if isinstance(last_validation_pars_train[index], str):
-                context += last_validation_pars_train[index]
-
-            articles_train.append((article, context))
-    else:
-        for index in range(len(statements_train)):
-            articles_train.append(statements_train[index])
-
-    articles_test = []
-    if first_validation_pars_test and last_validation_pars_test:
-        for index in range(len(statements_test)):
-            article = statements_test[index]
-            context = ""
-            if isinstance(first_validation_pars_test[index], str):
-                context += f"{first_validation_pars_test[index]} "
-            if isinstance(last_validation_pars_test[index], str):
-                context += last_validation_pars_test[index]
-            articles_test.append((article, context))
-    else:
-        for index in range(len(statements_test)):
-            articles_test.append(statements_test[index])
+    articles_train = statements_to_list(statements_train, first_validation_pars_train, last_validation_pars_train)
+    articles_test = statements_to_list(statements_test, first_validation_pars_test, last_validation_pars_test)
 
     feed_inputs_train = bert_wrapper.process_input(articles_train)
     feed_inputs_test = bert_wrapper.process_input(articles_test)
 
     model.fit(feed_inputs_train, np.asarray(labels_train))
 
-    result = model.predict(feed_inputs_test, batch_size=32)
-    print(f"Mean squared error test: {mean_squared_error(result, labels_test)}")
-    print(model.evaluate(feed_inputs_test, labels_test))
+    # result = model.predict(feed_inputs_test, batch_size=32)
+    print(f"Mean squared error train: {model.evaluate(feed_inputs_test, np.asarray(labels_train))}")
+    print(f"Mean squared error test: {model.evaluate(feed_inputs_test, np.asarray(labels_test))}")
 
 def main():
     parser = argparse.ArgumentParser()
