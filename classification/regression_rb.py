@@ -3,6 +3,7 @@ import argparse
 import pandas as pd
 from tensorflow import keras
 import numpy as np
+import bert
 
 
 train_files = ["FactualVerificari/labeled_factual_big_train_2.csv"]
@@ -54,6 +55,7 @@ def run_bert_rb(
         last_validation_pars_train=None,
         first_validation_pars_test=None,
         last_validation_pars_test=None,
+        freeze=False,
 ):
     bert_wrapper = BertWrapper(Lang.RO, max_seq_len=256, custom_model=True)
     inputs, bert_output = bert_wrapper.create_inputs_and_model()
@@ -61,6 +63,12 @@ def run_bert_rb(
 
     output = keras.layers.Dense(1, activation='linear')(cls_output)
     model = keras.Model(inputs=inputs, outputs=output)
+
+    if freeze:
+        for layer in model.layers:
+            if isinstance(layer, bert.BertModelLayer):
+                layer.trainable = False
+
     model.compile(loss='mean_squared_error')
     bert_wrapper.load_weights()
 
@@ -78,6 +86,7 @@ def run_bert_rb(
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--freeze", action="store_true", default=False, dest="freeze")
     parser.add_argument("--feature-type", type=str, default="statement")
 
     args = parser.parse_args()
@@ -117,6 +126,7 @@ def main():
         last_validation_pars_train,
         first_validation_pars_test,
         last_validation_pars_test,
+        args.freeze,
     )
 
 if __name__ == "__main__":
