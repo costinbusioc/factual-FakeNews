@@ -78,8 +78,6 @@ def run_bert_rb(
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-t", "--train", action="store_true", help="train model")
-    parser.add_argument("-p", "--predict", action="store_true", help="predict model")
     parser.add_argument("--feature-type", type=str, default="statement")
 
     args = parser.parse_args()
@@ -96,14 +94,19 @@ def main():
     dataframe_test = read_dataframe(test_files[0])
 
     statements_train = dataframe_train["text"].tolist()
-    first_validation_pars_train = dataframe_train["first_validation_par"].tolist()
-    last_validation_pars_train = dataframe_train["last_validation_par"].tolist()
     labels_train = convert_labels_for_regression(dataframe_train["label"])
 
     statements_test = dataframe_test["text"].tolist()
-    first_validation_pars_test = dataframe_test["first_validation_par"].tolist()
-    last_validation_pars_test = dataframe_test["last_validation_par"].tolist()
     labels_test = convert_labels_for_regression(dataframe_test["label"])
+
+    first_validation_pars_train, last_validation_pars_train = None
+    first_validation_pars_test, last_validation_pars_test = None
+    if feature_type == "with-validation":
+        first_validation_pars_train = dataframe_train["first_validation_par"].tolist()
+        last_validation_pars_train = dataframe_train["last_validation_par"].tolist()
+
+        first_validation_pars_test = dataframe_test["first_validation_par"].tolist()
+        last_validation_pars_test = dataframe_test["last_validation_par"].tolist()
 
     run_bert_rb(
         statements_train,
