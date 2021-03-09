@@ -28,13 +28,13 @@ def run_bert_rb(
         first_validation_pars_test=None,
         last_validation_pars_test=None,
 ):
-    bert_wrapper = BertWrapper(Lang.RO, max_seq_len=512, custom_model=True)
+    bert_wrapper = BertWrapper(Lang.RO, max_seq_len=256, custom_model=True)
     inputs, bert_output = bert_wrapper.create_inputs_and_model()
     cls_output = bert_wrapper.get_output(bert_output, "cls")
 
-    output = keras.layers.Dense(32)(cls_output)
+    output = keras.layers.Dense(1, activation='linear')(cls_output)
     model = keras.Model(inputs=inputs, outputs=output)
-    model.compile()
+    model.compile(loss='mean_squared_error')
     bert_wrapper.load_weights()
 
     articles_train = []
