@@ -5,6 +5,7 @@ import pickle
 import argparse
 import pandas as pd
 from tensorflow import keras
+import numpy as np
 
 
 train_files = ["FactualVerificari/labeled_factual_big_train_2.csv"]
@@ -16,33 +17,6 @@ def read_dataframe(input_file):
     dataframe = dataframe.drop(["Unnamed: 0", "Unnamed: 0.1"], axis=1)
     return dataframe
 
-
-def get_features(statements, first_validation_pars=None, last_validation_pars=None):
-    bert_wrapper = BertWrapper(Lang.RO, max_seq_len=512, custom_model=True)
-    inputs, bert_output = bert_wrapper.create_inputs_and_model()
-    cls_output = bert_wrapper.get_output(bert_output, "cls")
-
-    model = keras.Model(inputs=inputs, outputs=[cls_output])
-    model.compile()
-    bert_wrapper.load_weights()
-
-    articles = []
-    if first_validation_pars and last_validation_pars:
-        for index in range(len(statements)):
-            article = statements[index]
-            context = ""
-            if isinstance(first_validation_pars[index], str):
-                context += f"{first_validation_pars[index]} "
-            if isinstance(last_validation_pars[index], str):
-                context += last_validation_pars[index]
-
-            articles.append((article, context))
-    else:
-        for index in range(len(statements)):
-            articles.append(statements[index])
-
-    feed_inputs = bert_wrapper.process_input(articles)
-    return model.predict(feed_inputs, batch_size=32)
 
 def run_bert_rb(
         statements_train,
@@ -95,7 +69,7 @@ def run_bert_rb(
     feed_inputs_train = bert_wrapper.process_input(articles_train)
     feed_inputs_test = bert_wrapper.process_input(articles_test)
 
-    model.fit(feed_inputs_train, labels_train)
+    model.fit(feed_inputs_train, np.asarray(labels_train))
 
     result = model.predict(feed_inputs_test, batch_size=32)
     print(result)
