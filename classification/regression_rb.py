@@ -73,7 +73,7 @@ def run_bert_rb(
     model.fit(feed_inputs_train, np.asarray(labels_train))
 
     # result = model.predict(feed_inputs_test, batch_size=32)
-    print(f"Mean squared error train: {model.evaluate(feed_inputs_test, np.asarray(labels_train))}")
+    print(f"Mean squared error train: {model.evaluate(feed_inputs_train, np.asarray(labels_train))}")
     print(f"Mean squared error test: {model.evaluate(feed_inputs_test, np.asarray(labels_test))}")
 
 def main():
@@ -99,8 +99,8 @@ def main():
     statements_test = dataframe_test["text"].tolist()
     labels_test = convert_labels_for_regression(dataframe_test["label"])
 
-    first_validation_pars_train, last_validation_pars_train = None
-    first_validation_pars_test, last_validation_pars_test = None
+    first_validation_pars_train, last_validation_pars_train = None, None
+    first_validation_pars_test, last_validation_pars_test = None, None
     if feature_type == "with-validation":
         first_validation_pars_train = dataframe_train["first_validation_par"].tolist()
         last_validation_pars_train = dataframe_train["last_validation_par"].tolist()
