@@ -70,7 +70,7 @@ def run_bert_rb(
                 layer.trainable = False
 
     optimizer = keras.optimizers.Adam(lr=1e-5)
-	model.compile(loss='mean_squared_error', optimizer=optimizer)
+    model.compile(loss='mean_squared_error', optimizer=optimizer)
     bert_wrapper.load_weights()
 
     articles_train = statements_to_list(statements_train, first_validation_pars_train, last_validation_pars_train)
