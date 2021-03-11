@@ -69,17 +69,35 @@ def run_bert_rb(
             if isinstance(layer, bert.BertModelLayer):
                 layer.trainable = False
 
-    optimizer = keras.optimizers.Adam(lr=1e-5)
-    model.compile(loss='mean_squared_error', optimizer=optimizer)
-    bert_wrapper.load_weights()
+        optimizer = keras.optimizers.Adam(lr=1e-5)
+        model.compile(loss='mean_squared_error', optimizer=optimizer)
+        bert_wrapper.load_weights()
 
-    articles_train = statements_to_list(statements_train, first_validation_pars_train, last_validation_pars_train)
-    articles_test = statements_to_list(statements_test, first_validation_pars_test, last_validation_pars_test)
+        articles_train = statements_to_list(statements_train, first_validation_pars_train, last_validation_pars_train)
+        articles_test = statements_to_list(statements_test, first_validation_pars_test, last_validation_pars_test)
 
-    feed_inputs_train = bert_wrapper.process_input(articles_train)
-    feed_inputs_test = bert_wrapper.process_input(articles_test)
+        feed_inputs_train = bert_wrapper.process_input(articles_train)
+        feed_inputs_test = bert_wrapper.process_input(articles_test)
 
-    model.fit(feed_inputs_train, np.asarray(labels_train), epochs=10)
+        model.fit(feed_inputs_train, np.asarray(labels_train), epochs=5)
+
+        for layer in model.layers:
+            if isinstance(layer, bert.BertModelLayer):
+                layer.trainable = True
+        model.compile(loss='mean_squared_error', optimizer=optimizer)
+        model.fit(feed_inputs_train, np.asarray(labels_train), epochs=5)
+    else:
+        optimizer = keras.optimizers.Adam(lr=1e-5)
+        model.compile(loss='mean_squared_error', optimizer=optimizer)
+        bert_wrapper.load_weights()
+
+        articles_train = statements_to_list(statements_train, first_validation_pars_train, last_validation_pars_train)
+        articles_test = statements_to_list(statements_test, first_validation_pars_test, last_validation_pars_test)
+
+        feed_inputs_train = bert_wrapper.process_input(articles_train)
+        feed_inputs_test = bert_wrapper.process_input(articles_test)
+
+        model.fit(feed_inputs_train, np.asarray(labels_train), epochs=10)
 
     # result = model.predict(feed_inputs_test, batch_size=32)
     print(f"Mean squared error train: {model.evaluate(feed_inputs_train, np.asarray(labels_train))}")
