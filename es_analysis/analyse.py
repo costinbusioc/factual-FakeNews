@@ -12,12 +12,6 @@ client = Elasticsearch(host)
 
 # all_indices = client.indices.get_alias("*")
 
-# keep track of the number of the documents returned
-doc_count = 0
-
-match_all = {"size": 100, "query": {"match_all": {}}}
-
-
 def read_csv():
     data = []
     df = pd.read_csv("factual_big.csv")
@@ -51,6 +45,9 @@ def query_by_url(url):
 
 
 def get_all_docs():
+    doc_count = 0
+    match_all = {"size": 100, "query": {"match_all": {}}}
+
     # make a search() request to get all docs in the index
     resp = client.search(
         index=index,
