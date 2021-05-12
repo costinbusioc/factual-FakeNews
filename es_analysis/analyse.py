@@ -1,4 +1,3 @@
-import json
 import pandas as pd
 
 from elasticsearch import Elasticsearch
@@ -16,19 +15,24 @@ client = Elasticsearch(host)
 # keep track of the number of the documents returned
 doc_count = 0
 
-match_all = {
-    "size": 100,
-    "query": {
-        "match_all": {}
-    }
-}
+match_all = {"size": 100, "query": {"match_all": {}}}
 
-def get_urls():
+
+def read_csv():
+    data = []
     df = pd.read_csv("factual_big.csv")
-    return df["validation_resources"]
 
-def filter_urls(urls):
-    return [url for url in urls.split('\n') if url]
+    for index, row in df.iterrows():
+        data.append(
+            {
+                "text": row["text"].strip(),
+                "urls": [url for url in row["validation_resources"].split("\n") if url],
+                "context": row["validation_content"].strip(),
+            }
+        )
+
+    return data
+
 
 def query_by_url(url):
     match_url = {
@@ -45,54 +49,53 @@ def query_by_url(url):
     )
     return resp["hits"]
 
-'''
-# make a search() request to get all docs in the index
-resp = client.search(
-    index = index,
-    body = match_all,
-    scroll = '2s' # length of time to keep search context
-)
 
-# keep track of pass scroll _id
-old_scroll_id = resp['_scroll_id']
-
-es_urls = []
-# use a 'while' iterator to loop over document 'hits'
-while len(resp['hits']['hits']):
-
-    # make a request using the Scroll API
-    resp = client.scroll(
-        scroll_id = old_scroll_id,
-        scroll = '2s' # length of time to keep search context
+def get_all_docs():
+    # make a search() request to get all docs in the index
+    resp = client.search(
+        index=index,
+        body=match_all,
+        scroll="2s",  # length of time to keep search context
     )
 
-    # check if there's a new scroll ID
-    if old_scroll_id != resp['_scroll_id']:
-        print ("NEW SCROLL ID:", resp['_scroll_id'])
-
     # keep track of pass scroll _id
-    old_scroll_id = resp['_scroll_id']
+    old_scroll_id = resp["_scroll_id"]
 
-    # print the response results
-    print ("\nresponse for index:", index)
-    print ("_scroll_id:", resp['_scroll_id'])
-    print ('response["hits"]["total"]["value"]:', resp["hits"]["total"]["value"])
+    es_urls = []
+    while len(resp["hits"]["hits"]):
+        resp = client.scroll(
+            scroll_id=old_scroll_id,
+            scroll="2s",  # length of time to keep search context
+        )
 
-    # iterate over the document hits for each 'scroll'
-    for doc in resp['hits']['hits']:
-        print ("\n", doc['_id'], doc['_source']['url'])
-        doc_count += 1
-        print ("DOC COUNT:", doc_count)
-        es_urls.append(doc['_source']['url'])
+        # check if there's a new scroll ID
+        if old_scroll_id != resp["_scroll_id"]:
+            print("NEW SCROLL ID:", resp["_scroll_id"])
 
-# print the total time and document count at the end
-print ("\nTOTAL DOC COUNT:", doc_count)
-es_urls.sort()
-print(len(es_urls))
+        # keep track of pass scroll _id
+        old_scroll_id = resp["_scroll_id"]
+
+        # print the response results
+        print("\nresponse for index:", index)
+        print("_scroll_id:", resp["_scroll_id"])
+        print('response["hits"]["total"]["value"]:', resp["hits"]["total"]["value"])
+
+        # iterate over the document hits for each 'scroll'
+        for doc in resp["hits"]["hits"]:
+            print("\n", doc["_id"], doc["_source"]["url"])
+            doc_count += 1
+            print("DOC COUNT:", doc_count)
+            es_urls.append(doc["_source"]["url"])
+
+    # print the total time and document count at the end
+    print("\nTOTAL DOC COUNT:", doc_count)
+    es_urls.sort()
+    print(len(es_urls))
+
+
 not_found = 0
-'''
 
-'''
+"""
 for urls_list in get_urls():
     urls = filter_urls(urls_list)
     for url in urls:
@@ -108,7 +111,7 @@ for urls_list in get_urls():
         print(hits)
         if hits["hits"]:
         break
-'''
+"""
 
 url = "https://www.libertatea.ro/stiri/teste-coronavirus-2915434"
 resp = query_by_url(url)
