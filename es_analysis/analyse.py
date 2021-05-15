@@ -40,7 +40,7 @@ def query_by_field(field, text):
         }
     }
 
-def query_by_field_and_nouns(field, text, orgs_pers):
+def query_by_field_and_nouns(field, text, orgs_pers, nouns):
     return {
       "query": {
         "bool": {
@@ -55,7 +55,7 @@ def query_by_field_and_nouns(field, text, orgs_pers):
             {
                 "match": {
                     f"{field}": {
-                        "query": " ".join(orgs_pers),
+                        "query": " ".join(nouns),
                         "operator": "and",
                         "boost": 2,
                     }
@@ -158,7 +158,7 @@ for i in range(10):
     nouns = get_nouns(entry["text"])
     orgs_pers = get_org_persons(entry["text"])
 
-    query = query_by_field_and_nouns("maintext", entry["text"], orgs_pers)
+    query = query_by_field_and_nouns("maintext", entry["text"], orgs_pers, nouns)
     resp = run_query(query)
 
     unique_entries = []
