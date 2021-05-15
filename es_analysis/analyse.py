@@ -131,7 +131,17 @@ for i in range(10):
     query = query_by_field("maintext", entry["text"])
     resp = run_query(query)
 
+    unique_entries = {}
     for hit in resp["hits"]:
+        if len(unique_entries) == 3:
+            break
+
+        if hit["_source"]["url"] in unique_entries:
+            continue
+
+        unique_entries["url"] = hit
+
+    for url, hit in unique_entries.items():
         print(hit["_score"])
         print(hit["_source"]["url"])
         print(hit["_source"]["title"])
