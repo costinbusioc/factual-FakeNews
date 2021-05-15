@@ -2,6 +2,8 @@ import pandas as pd
 
 from elasticsearch import Elasticsearch
 
+from detect_nouns import get_nouns, get_org_persons
+
 DOMAIN = "localhost"
 PORT = 9200
 index = "factual-news"
@@ -127,6 +129,12 @@ data = read_csv()
 for i in range(10):
     entry = data[i]
     print(entry["text"])
+
+    nouns = get_nouns(entry["text"])
+    orgs_pers = get_org_persons(entry["text"])
+
+    print(nouns)
+    print(orgs_pers)
 
     query = query_by_field("maintext", entry["text"])
     resp = run_query(query)
