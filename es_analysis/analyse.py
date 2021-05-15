@@ -128,7 +128,7 @@ for i in range(10):
     entry = data[i]
     print(entry["text"])
 
-    query = query_by_field("text", entry["text"])
+    query = query_by_field("maintext", entry["text"])
     resp = run_query(query)
 
     for hit in resp["hits"]:
