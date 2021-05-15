@@ -131,19 +131,25 @@ for i in range(10):
     query = query_by_field("maintext", entry["text"])
     resp = run_query(query)
 
-    unique_entries = {}
+    unique_entries = []
+    selected_urls = {}
+    selected_titles = {}
+
     for hit in resp["hits"]:
         url = hit["_source"]["url"]
+        title = hit["_source"]["title"]
 
         if len(unique_entries) == 3:
             break
 
-        if unique_entries.get(url):
+        if selected_urls.get(url) or selected_titles.get(title):
             continue
 
-        unique_entries[url] = hit
+        unique_entries.append(hit)
+        selected_urls[url] = 1
+        selected_titles[title] = 1
 
-    for url, hit in unique_entries.items():
+    for hit in unique_entries:
         print(hit["_score"])
         print(hit["_source"]["url"])
         print(hit["_source"]["title"])
