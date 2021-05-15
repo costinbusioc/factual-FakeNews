@@ -29,17 +29,20 @@ def read_csv():
 
 
 def query_by_field(field, text):
-    match_url = {
+    return {
         "query": {
             "match": {
-                f"{field}": text,
+                f"{field}": {
+                    "query": text,
+                }
             }
         }
     }
 
+def run_query(query):
     resp = client.search(
         index=index,
-        body=match_url,
+        body=query,
     )
     return resp["hits"]
 
@@ -125,7 +128,8 @@ for i in range(10):
     entry = data[i]
     print(entry["text"])
 
-    resp = query_by_field("text", entry["text"])
+    query = query_by_field("text", entry["text"])
+    resp = run_query(query)
     print(resp)
 
     for hit in resp["hits"]:
