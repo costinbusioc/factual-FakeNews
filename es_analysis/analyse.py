@@ -120,7 +120,14 @@ for hit in resp["hits"]:
 
 
 data = read_csv()
-resp = query_by_field("text", data[0]["text"])
-for hit in resp["hits"]:
-    print(hit["_score"])
-    print(hit["_source"]["url"])
+
+for i in range(10):
+    entry = data[i]
+    print(entry["text"])
+
+    resp = query_by_field("text", entry["text"])
+    print(resp)
+
+    for hit in resp["hits"]:
+        print(hit["_score"])
+        print(hit["_source"]["url"])
