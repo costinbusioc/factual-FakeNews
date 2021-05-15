@@ -29,7 +29,6 @@ def read_csv():
 
     return data
 
-
 def query_by_field(field, text):
     return {
         "query": {
@@ -39,6 +38,32 @@ def query_by_field(field, text):
                 }
             }
         }
+    }
+
+def query_by_field_and_nouns(field, text, orgs_pers):
+    return {
+      "query": {
+        "bool": {
+          "should": [
+            {
+                "match": {
+                    f"{field}": {
+                        "query": text,
+                    }
+                }
+            },
+            {
+                "match": {
+                    f"{field}": {
+                        "query": " ".join(orgs_pers),
+                        "operator": "and",
+                        "boost": 2,
+                    }
+                }
+            },
+          ]
+        }
+      }
     }
 
 def run_query(query):
@@ -133,10 +158,7 @@ for i in range(10):
     nouns = get_nouns(entry["text"])
     orgs_pers = get_org_persons(entry["text"])
 
-    print(nouns)
-    print(orgs_pers)
-
-    query = query_by_field("maintext", entry["text"])
+    query = query_by_field_and_nouns("maintext", entry["text"], orgs_pers)
     resp = run_query(query)
 
     unique_entries = []
