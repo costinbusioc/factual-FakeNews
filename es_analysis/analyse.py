@@ -133,13 +133,15 @@ for i in range(10):
 
     unique_entries = {}
     for hit in resp["hits"]:
+        url = hit["_source"]["url"]
+
         if len(unique_entries) == 3:
             break
 
-        if hit["_source"]["url"] in unique_entries:
+        if unique_entries.get(url):
             continue
 
-        unique_entries["url"] = hit
+        unique_entries[url] = hit
 
     for url, hit in unique_entries.items():
         print(hit["_score"])
