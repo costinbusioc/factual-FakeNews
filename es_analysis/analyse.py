@@ -28,11 +28,11 @@ def read_csv():
     return data
 
 
-def query_by_url(url):
+def query_by_field(field, text):
     match_url = {
         "query": {
             "match": {
-                "url": url,
+                f"{field}": text,
             }
         }
     }
@@ -110,8 +110,17 @@ for urls_list in get_urls():
         break
 """
 
+'''
 url = "https://www.libertatea.ro/stiri/teste-coronavirus-2915434"
-resp = query_by_url(url)
+resp = query_by_field("url", url)
+for hit in resp["hits"]:
+    print(hit["_score"])
+    print(hit["_source"]["url"])
+'''
+
+
+data = read_csv()
+resp = query_by_field("text", data[0]["text"])
 for hit in resp["hits"]:
     print(hit["_score"])
     print(hit["_source"]["url"])
