@@ -130,8 +130,12 @@ for i in range(10):
 
     query = query_by_field("text", entry["text"])
     resp = run_query(query)
-    print(resp)
 
     for hit in resp["hits"]:
         print(hit["_score"])
         print(hit["_source"]["url"])
+        print(hit["_source"]["title"])
+        print(hit["_source"]["maintext"])
+        print("\n")
+
+    print("=========")
