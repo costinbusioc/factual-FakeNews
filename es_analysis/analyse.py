@@ -3,6 +3,7 @@ import pandas as pd
 from elasticsearch import Elasticsearch
 
 from detect_nouns import get_nouns, get_org_persons
+from helpers import print_hit
 
 DOMAIN = "localhost"
 PORT = 9200
@@ -40,6 +41,17 @@ def query_by_field(field, text):
         }
     }
 
+def query_by_field_match_phrase(field, text):
+    return {
+        "query": {
+            "match_phrase": {
+                f"{field}": {
+                    "query": text,
+                }
+            }
+        }
+    }
+
 def query_by_field_and_nouns(field, text, orgs_pers, nouns):
     return {
       "query": {
@@ -55,7 +67,7 @@ def query_by_field_and_nouns(field, text, orgs_pers, nouns):
             {
                 "match": {
                     f"{field}": {
-                        "query": " ".join(nouns),
+                        "query": " ".join(orgs_pers),
                         "operator": "and",
                         "boost": 2,
                     }
@@ -151,6 +163,7 @@ for hit in resp["hits"]:
 
 data = read_csv()
 
+"""
 for i in range(10):
     entry = data[i]
     print(entry["text"])
@@ -187,3 +200,10 @@ for i in range(10):
         print("\n")
 
     print("=========")
+"""
+
+query = query_by_field_match_phrase("maintext", "Gender Identity Development")
+resp = run_query(query)
+
+for hit in resp["hits"]:
+    print_hit(hit)
