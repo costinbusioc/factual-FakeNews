@@ -3,7 +3,7 @@ import pandas as pd
 from elasticsearch import Elasticsearch
 
 from detect_nouns import get_nouns, get_org_persons
-from helpers import print_hit
+from helpers import print_hit, get_unique_entries
 
 DOMAIN = "localhost"
 PORT = 9200
@@ -202,8 +202,37 @@ for i in range(10):
     print("=========")
 """
 
-query = query_by_field_match_phrase("maintext", "Gender Identity Development")
-resp = run_query(query)
+query = {
+    "query": {
+        "bool": {
+          "should": [
+            {
+                "match_phrase": {
+                    f"content": {
+                        "query": "pensiilor speciale",
+                    }
+                }
+            },
+            {
+                "match": {
+                    f"content": {
+                        "query": "PNL",
+                    }
+                }
+            },
+            {
+                "match": {
+                  f"content": {
+                      "query": "parlamentari",
+                  }
+                },
+            },
+          ]
+        }
+      }
+    }
 
-for hit in resp["hits"]:
+resp = get_unique_entries(run_query(query))
+
+for hit in resp:
     print_hit(hit)
