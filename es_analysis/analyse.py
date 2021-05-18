@@ -163,7 +163,6 @@ for hit in resp["hits"]:
 
 data = read_csv()
 
-"""
 for i in range(10):
     entry = data[i]
     print(entry["text"])
@@ -172,67 +171,9 @@ for i in range(10):
     orgs_pers = get_org_persons(entry["text"])
 
     query = query_by_field_and_nouns("maintext", entry["text"], orgs_pers, nouns)
-    resp = run_query(query)
+    resp = get_unique_entries(run_query(query))
 
-    unique_entries = []
-    selected_urls = {}
-    selected_titles = {}
-
-    for hit in resp["hits"]:
-        url = hit["_source"]["url"]
-        title = hit["_source"]["title"]
-
-        if len(unique_entries) == 3:
-            break
-
-        if selected_urls.get(url) or selected_titles.get(title):
-            continue
-
-        unique_entries.append(hit)
-        selected_urls[url] = 1
-        selected_titles[title] = 1
-
-    for hit in unique_entries:
-        print(hit["_score"])
-        print(hit["_source"]["url"])
-        print(hit["_source"]["title"])
-        print(hit["_source"]["maintext"])
-        print("\n")
+    for hit in resp:
+        print_hit(hit)
 
     print("=========")
-"""
-
-query = {
-    "query": {
-        "bool": {
-          "should": [
-            {
-                "match_phrase": {
-                    f"content": {
-                        "query": "pensiilor speciale",
-                    }
-                }
-            },
-            {
-                "match": {
-                    f"content": {
-                        "query": "PNL",
-                    }
-                }
-            },
-            {
-                "match": {
-                  f"content": {
-                      "query": "parlamentari",
-                  }
-                },
-            },
-          ]
-        }
-      }
-    }
-
-resp = get_unique_entries(run_query(query))
-
-for hit in resp:
-    print_hit(hit)
