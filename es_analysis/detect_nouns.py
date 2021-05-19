@@ -17,7 +17,7 @@ def get_org_persons(sentence):
     for ent in doc.ents:
         print(ent)
         print(ent.label_)
-        if ent.label_ in ["ORGANIZATION", "PERSON"]:
+        if ent.label_ in ["ORGANIZATION", "PERSON", "GPE"]:
             orgs_pers.append(ent.text)
 
     return orgs_pers
