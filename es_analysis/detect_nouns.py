@@ -9,13 +9,13 @@ def get_nouns(sentence):
         if token.pos_ == "NOUN":
             nouns.append(token.text)
 
-    return nouns
+    return list(set(nouns))
 
 def get_org_persons(sentence):
     orgs_pers = []
     doc = nlp(sentence)
     for ent in doc.ents:
         if ent.label_ in ["ORGANIZATION", "PERSON", "GPE", "LOC"]:
-            orgs_pers.append(ent.text)
+            orgs_pers.append(ent.text.split(",")[0])
 
-    return orgs_pers
+    return list(set(orgs_pers))
