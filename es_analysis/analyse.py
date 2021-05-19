@@ -163,15 +163,17 @@ for hit in resp["hits"]:
 
 data = read_csv()
 
-for i in range(10):
+for i in range(31):
     entry = data[i]
     print(entry["text"])
 
     nouns = get_nouns(entry["text"])
     orgs_pers = get_org_persons(entry["text"])
 
-    query = query_by_field_and_nouns("maintext", entry["text"], orgs_pers, nouns)
-    resp = get_unique_entries(run_query(query))
+    print(nouns)
+    print(orgs_pers)
+    # query = query_by_field_and_nouns("maintext", entry["text"], orgs_pers, nouns)
+    # resp = get_unique_entries(run_query(query))
 
     for hit in resp:
         print_hit(hit)
