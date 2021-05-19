@@ -15,9 +15,7 @@ def get_org_persons(sentence):
     orgs_pers = []
     doc = nlp(sentence)
     for ent in doc.ents:
-        print(ent)
-        print(ent.label_)
-        if ent.label_ in ["ORGANIZATION", "PERSON", "GPE"]:
+        if ent.label_ in ["ORGANIZATION", "PERSON", "GPE", "LOC"]:
             orgs_pers.append(ent.text)
 
     return orgs_pers
