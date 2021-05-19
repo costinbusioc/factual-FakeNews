@@ -175,7 +175,7 @@ for i in range(31):
     # query = query_by_field_and_nouns("maintext", entry["text"], orgs_pers, nouns)
     # resp = get_unique_entries(run_query(query))
 
-    for hit in resp:
-        print_hit(hit)
+    # for hit in resp:
+        # print_hit(hit)
 
     print("=========")

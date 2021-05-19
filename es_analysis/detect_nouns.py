@@ -1,6 +1,6 @@
 import spacy
 
-nlp = spacy.load("ro_core_news_sm")
+nlp = spacy.load("ro_core_news_lg")
 
 def get_nouns(sentence):
     nouns = []
@@ -15,6 +15,8 @@ def get_org_persons(sentence):
     orgs_pers = []
     doc = nlp(sentence)
     for ent in doc.ents:
+        print(ent)
+        print(ent.label_)
         if ent.label_ in ["ORGANIZATION", "PERSON"]:
             orgs_pers.append(ent.text)
 
