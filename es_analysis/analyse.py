@@ -2,8 +2,7 @@ import pandas as pd
 
 from elasticsearch import Elasticsearch
 
-from detect_nouns import get_nouns, get_org_persons
-from helpers import print_hit, get_unique_entries
+from helpers import print_hit, get_unique_entries, compute_query_1
 
 DOMAIN = "localhost"
 PORT = 9200
@@ -30,16 +29,6 @@ def read_csv():
 
     return data
 
-def query_by_field(field, text):
-    return {
-        "query": {
-            "match": {
-                f"{field}": {
-                    "query": text,
-                }
-            }
-        }
-    }
 
 def query_by_field_match_phrase(field, text):
     return {
@@ -52,31 +41,6 @@ def query_by_field_match_phrase(field, text):
         }
     }
 
-def query_by_field_and_nouns(field, text, orgs_pers, nouns):
-    return {
-      "query": {
-        "bool": {
-          "should": [
-            {
-                "match": {
-                    f"{field}": {
-                        "query": text,
-                    }
-                }
-            },
-            {
-                "match": {
-                    f"{field}": {
-                        "query": " ".join(orgs_pers),
-                        "operator": "and",
-                        "boost": 2,
-                    }
-                }
-            },
-          ]
-        }
-      }
-    }
 
 def run_query(query):
     resp = client.search(
@@ -167,15 +131,10 @@ for i in range(31):
     entry = data[i]
     print(entry["text"])
 
-    nouns = get_nouns(entry["text"])
-    orgs_pers = get_org_persons(entry["text"])
+    query = compute_query_1(entry["text"])
+    resp = get_unique_entries(run_query(query))
 
-    print(nouns)
-    print(orgs_pers)
-    # query = query_by_field_and_nouns("maintext", entry["text"], orgs_pers, nouns)
-    # resp = get_unique_entries(run_query(query))
-
-    # for hit in resp:
-        # print_hit(hit)
+    for hit in resp:
+        print_hit(hit)
 
     print("=========")
