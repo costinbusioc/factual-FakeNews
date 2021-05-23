@@ -132,7 +132,7 @@ for i in range(31):
     print(entry["text"])
 
     query = compute_query_1(entry["text"])
-    resp = get_unique_entries(run_query(query))
+    resp = get_unique_entries(run_query(query))[:5]
 
     for hit in resp:
         print_hit(hit)

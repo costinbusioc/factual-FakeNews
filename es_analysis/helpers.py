@@ -80,7 +80,6 @@ def compute_query_1(entry_text):
         should_queries.append(compose_match_phrase_from_word(org_pers))
 
     text_query = compose_query_by_field(entry_text)
-    print(text_query)
     nouns_query = compose_match_from_words_list(nouns)
 
     should_queries.append(nouns_query)
