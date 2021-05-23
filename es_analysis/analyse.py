@@ -129,6 +129,7 @@ data = read_csv()
 
 for i in range(31):
     entry = data[i]
+    print(f"{i}\n")
     print(entry["text"])
 
     query = compute_query_1(entry["text"])
