@@ -52,11 +52,9 @@ def compose_match_from_words_list(words, boost=2):
 
 def compose_query_by_field(text):
     return {
-        "query": {
-            "match": {
-                "maintext": {
-                    "query": text,
-                }
+        "match": {
+            "maintext": {
+                "query": text,
             }
         }
     }
