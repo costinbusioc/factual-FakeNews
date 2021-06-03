@@ -13,11 +13,14 @@ test_file = "FactualVerificari/test.csv"
 def read_dataframe(input_file):
     return pd.read_csv(input_file, encoding="utf-8")
 
-def statements_to_list(statements, contexts):
+def statements_to_list(statements, contexts, labels):
     articles = []
+    new_labels = []
+
     for i, statement in enumerate(statements):
         for j in range(5):
             articles.append((statement, contexts[j][i]))
+        new_labels += [labels[i]] * 5
 
     return articles
 
@@ -40,8 +43,8 @@ def run_bert_rb(
     model.compile(loss='mean_squared_error', optimizer=optimizer)
     bert_wrapper.load_weights()
 
-    articles_train = statements_to_list(statements_train, contexts_train)
-    articles_test = statements_to_list(statements_test, contexts_test)
+    articles_train, labels_train = statements_to_list(statements_train, contexts_train, labels_train)
+    articles_test, labels_test = statements_to_list(statements_test, contexts_test, labels_test)
 
     feed_inputs_train = bert_wrapper.process_input(articles_train)
     feed_inputs_test = bert_wrapper.process_input(articles_test)
