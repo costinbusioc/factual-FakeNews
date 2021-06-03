@@ -16,7 +16,7 @@ client = Elasticsearch(host)
 
 def read_csv():
     data = []
-    df = pd.read_csv("factual_big.csv")
+    df = pd.read_csv("labeled_factual_big_test_2.csv")
 
     for index, row in df.iterrows():
         data.append(
@@ -27,7 +27,7 @@ def read_csv():
             }
         )
 
-    return data
+    return df, data
 
 
 def query_by_field_match_phrase(field, text):
@@ -125,7 +125,7 @@ for hit in resp["hits"]:
 '''
 
 
-data = read_csv()
+df, data = read_csv()
 
 for i in range(31):
     entry = data[i]
@@ -135,7 +135,10 @@ for i in range(31):
     query = compute_query_1(entry["text"])
     resp = get_unique_entries(run_query(query))[:5]
 
-    for hit in resp:
-        print_hit(hit)
+    hits = [hit["_source"]["maintext"] for hit in resp]
+    for i, hit in enumerate(hits):
+        df[f"context_{i}"] = hit
 
     print("=========")
+
+df.to_csv("context_labeled_factual_big_test_2.csv")
