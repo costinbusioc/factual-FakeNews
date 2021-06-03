@@ -22,7 +22,7 @@ def statements_to_list(statements, contexts, labels):
             articles.append((statement, contexts[j][i]))
         new_labels += [labels[i]] * 5
 
-    return articles
+    return articles, new_labels
 
 def run_bert_rb(
     statements_train,
