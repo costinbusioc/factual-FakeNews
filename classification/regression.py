@@ -1,8 +1,6 @@
-from transformers import BertTokenizer, BertModel
 from rb.processings.encoders.bert import BertWrapper, Lang
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
-import torch
 import pickle
 import argparse
 import pandas as pd
@@ -20,11 +18,39 @@ def read_dataframe(input_file):
 
 
 def get_features(statements, first_validation_pars=None, last_validation_pars=None):
-    bert_wrapper = BertWrapper(Lang.RO, max_seq_len=128, custom_model=True)
+    bert_wrapper = BertWrapper(Lang.RO, max_seq_len=512, custom_model=True)
     inputs, bert_output = bert_wrapper.create_inputs_and_model()
     cls_output = bert_wrapper.get_output(bert_output, "cls")
 
     model = keras.Model(inputs=inputs, outputs=[cls_output])
+    model.compile()
+    bert_wrapper.load_weights()
+
+    articles = []
+    if first_validation_pars and last_validation_pars:
+        for index in range(len(statements)):
+            article = statements[index]
+            context = ""
+            if isinstance(first_validation_pars[index], str):
+                context += f"{first_validation_pars[index]} "
+            if isinstance(last_validation_pars[index], str):
+                context += last_validation_pars[index]
+
+            articles.append((article, context))
+    else:
+        for index in range(len(statements)):
+            articles.append(statements[index])
+
+    feed_inputs = bert_wrapper.process_input(articles)
+    return model.predict(feed_inputs, batch_size=32)
+
+def run_bert_rb(statements, labels, first_validation_pars=None, last_validation_pars=None):
+    bert_wrapper = BertWrapper(Lang.RO, max_seq_len=512, custom_model=True)
+    inputs, bert_output = bert_wrapper.create_inputs_and_model()
+    cls_output = bert_wrapper.get_output(bert_output, "cls")
+
+    output = keras.layers.Dense(32)(cls_output)
+    model = keras.Model(inputs=inputs, outputs=output)
     model.compile()
     bert_wrapper.load_weights()
 
