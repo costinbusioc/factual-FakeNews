@@ -105,7 +105,7 @@ def run_bert_rb(
         correct_max = 0
         correct_common = 0
 
-        for pos in range(len(predictions), 5):
+        for pos in range(0, len(predictions), 5):
             statement_pred = predictions[pos:(pos+5)]
 
             max_result = compute_values_based_on_max(statement_pred)
@@ -141,7 +141,7 @@ def run_bert_rb(
     common_results = []
     true_labels = []
 
-    for pos in range(len(predictions), 5):
+    for pos in range(0, len(predictions), 5):
         statement_pred = predictions[pos:(pos + 5)]
 
         max_results.append(compute_values_based_on_max(statement_pred))
