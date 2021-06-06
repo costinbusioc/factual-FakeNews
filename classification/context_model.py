@@ -154,9 +154,6 @@ def run_bert_rb(
 def compute_confusion(predictions, true_labels):
     confusion = np.zeros((4,4), dtype=np.int32)
     for pred, target in zip(predictions, true_labels):
-        pred = int(np.argmax(pred))
-        pred = round(pred[0] * 3)
-        target = round(target * 3)
         confusion[pred, target] += 1
 
     print(confusion)
