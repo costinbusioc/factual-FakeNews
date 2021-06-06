@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold
 from tensorflow import keras
+from statistics import mode
 
 train_file = "FactualVerificari/context_labeled_factual_big_train_2.csv"
 train_file = "FactualVerificari/test.csv"
@@ -31,6 +32,24 @@ def build_model(bw: BertWrapper) -> keras.Model:
     model = keras.Model(inputs=inputs, outputs=output)
     return model
 
+def compute_values_based_on_max(results):
+    max_vals, max_pos = [], []
+    for result in results:
+        max_val = np.max(result)
+        pos = int(np.argmax(result))
+
+        max_vals.append(max_val)
+        max_pos.append(pos)
+
+    return max_pos[max_vals.index(max(max_vals))]
+
+def compute_values_based_on_majority(results):
+    max_pos = []
+    for result in results:
+        max_pos.append(int(np.argmax(result)))
+
+    return mode(max_pos)
+
 def run_bert_rb(
         statements_train,
         labels_train,
@@ -58,7 +77,11 @@ def run_bert_rb(
 
     test_articles, labels_test = statements_to_list(statements_test, contexts_test, labels_test)
     test_inputs = bw.process_input(test_articles)
+
     accuracies = []
+    max_accuracies = []
+    most_common_accuracies = []
+
     for i in range(10):
         bw = BertWrapper(Lang.RO, max_seq_len=256)
         model = build_model(bw)
@@ -76,18 +99,68 @@ def run_bert_rb(
         history = model.fit(all_inputs, labels_train, batch_size=batch_size, epochs=1,
                             validation_data=(test_inputs, labels_test), sample_weight=sample_weights)
         accuracies.append(history.history["val_accuracy"][-1])
+
+        predictions = model.predict(test_inputs)
+
+        correct_max = 0
+        correct_common = 0
+
+        for pos in range(len(predictions), 5):
+            statement_pred = predictions[pos:(pos+5)]
+
+            max_result = compute_values_based_on_max(statement_pred)
+            most_common = compute_values_based_on_majority(statement_pred)
+
+            if max_result == labels_test[pos]:
+                correct_max +=1
+
+            if most_common == labels_test[pos]:
+                correct_common += 1
+
+            print(max_result)
+            print(most_common)
+            print(statement_pred)
+            print("=======")
+
+        max_accuracies.append((correct_max/(len(labels_test)/5)))
+        most_common_accuracies.append((correct_common/(len(labels_test)/5)))
+
     print(f"Min acc: {np.min(accuracies)}")
     print(f"Max acc: {np.max(accuracies)}")
     print(f"Mean acc: {np.mean(accuracies)}")
+    print(f"Min acc max: {np.min(max_accuracies)}")
+    print(f"Max acc max: {np.max(max_accuracies)}")
+    print(f"Mean acc max: {np.mean(max_accuracies)}")
+    print(f"Min acc most common: {np.min(most_common_accuracies)}")
+    print(f"Max acc most common: {np.max(most_common_accuracies)}")
+    print(f"Mean acc most common: {np.mean(most_common_accuracies)}")
 
-    # predictions = model.predict(test_inputs)
-    # confusion = np.zeros((4,4), dtype=np.int32)
-    # for pred, target in zip(predictions, labels_test):
-    #     pred = int(np.argmax(pred))
-    #     # pred = round(pred[0] * 3)
-    #     # target = round(target * 3)
-    #     confusion[pred, target] += 1
-    # print(confusion)
+    predictions = model.predict(test_inputs)
+
+    max_results = []
+    common_results = []
+    true_labels = []
+
+    for pos in range(len(predictions), 5):
+        statement_pred = predictions[pos:(pos + 5)]
+
+        max_results.append(compute_values_based_on_max(statement_pred))
+        common_results.append(compute_values_based_on_majority(statement_pred))
+        true_labels.append(labels_test[pos])
+
+    compute_confusion(max_results, true_labels)
+    compute_confusion(common_results, true_labels)
+
+def compute_confusion(predictions, true_labels):
+    confusion = np.zeros((4,4), dtype=np.int32)
+    for pred, target in zip(predictions, true_labels):
+        pred = int(np.argmax(pred))
+        pred = round(pred[0] * 3)
+        target = round(target * 3)
+        confusion[pred, target] += 1
+
+    print(confusion)
+
     # with open("predictions.csv", "wt", encoding="utf-8") as f:
     #     writer = csv.writer(f)
     #     for pred, target, text in zip(predictions, labels_test, statements_test):
