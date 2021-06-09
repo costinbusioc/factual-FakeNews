@@ -98,8 +98,8 @@ def main():
 
     statements_train = dataframe_train["text"].tolist()
     statements_test = dataframe_test["text"].tolist()
-    labels_train = dataframe_train["label"].tolist()
-    labels_test = dataframe_test["label"].tolist()
+    labels_train = np.array(dataframe_train["label"], np.int32)
+    labels_test = np.array(dataframe_test["label"], np.int32)
 
     contexts_train = dataframe_train[f"context_0"].tolist()
     contexts_test = dataframe_test[f"context_0"].tolist()
