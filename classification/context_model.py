@@ -6,7 +6,7 @@ from tensorflow import keras
 from statistics import mode
 
 train_file = "FactualVerificari/context_labeled_factual_big_train_2.csv"
-train_file = "FactualVerificari/test.csv"
+# train_file = "FactualVerificari/test.csv"
 test_file = "FactualVerificari/context_labeled_factual_big_test_2.csv"
 
 def read_dataframe(input_file):
@@ -17,9 +17,9 @@ def statements_to_list(statements, contexts, labels):
     new_labels = []
 
     for i, statement in enumerate(statements):
-        for j in range(5):
+        for j in range(3):
             articles.append((statement, contexts[j][i]))
-        new_labels += [labels[i]] * 5
+        new_labels += [labels[i]] * 3
 
     return articles, np.array(new_labels, np.int32)
 
@@ -105,8 +105,8 @@ def run_bert_rb(
         correct_max = 0
         correct_common = 0
 
-        for pos in range(0, len(predictions), 5):
-            statement_pred = predictions[pos:(pos+5)]
+        for pos in range(0, len(predictions), 3):
+            statement_pred = predictions[pos:(pos+3)]
 
             max_result = compute_values_based_on_max(statement_pred)
             most_common = compute_values_based_on_majority(statement_pred)
@@ -122,8 +122,8 @@ def run_bert_rb(
             print(statement_pred)
             print("=======")
 
-        max_accuracies.append((correct_max/(len(labels_test)/5)))
-        most_common_accuracies.append((correct_common/(len(labels_test)/5)))
+        max_accuracies.append((correct_max/(len(labels_test)/3)))
+        most_common_accuracies.append((correct_common/(len(labels_test)/3)))
 
     print(f"Min acc: {np.min(accuracies)}")
     print(f"Max acc: {np.max(accuracies)}")
@@ -141,8 +141,8 @@ def run_bert_rb(
     common_results = []
     true_labels = []
 
-    for pos in range(0, len(predictions), 5):
-        statement_pred = predictions[pos:(pos + 5)]
+    for pos in range(0, len(predictions), 3):
+        statement_pred = predictions[pos:(pos + 3)]
 
         max_results.append(compute_values_based_on_max(statement_pred))
         common_results.append(compute_values_based_on_majority(statement_pred))
@@ -173,11 +173,11 @@ def main():
     labels_test = dataframe_test["label"].tolist()
 
     contexts_train = []
-    for i in range(5):
+    for i in range(3):
         contexts_train.append(dataframe_train[f"context_{i}"].tolist())
 
     contexts_test = []
-    for i in range(5):
+    for i in range(3):
         contexts_test.append(dataframe_test[f"context_{i}"].tolist())
 
     run_bert_rb(
