@@ -120,7 +120,7 @@ transformers==3.5.1
 typing-extensions==3.7.4.3
 tzlocal==2.1
 urllib3==1.26.2
-validators==0.18.1
+validators==0.21.0
 wandb==0.10.10
 watchdog==0.10.3
 wcwidth==0.2.5
