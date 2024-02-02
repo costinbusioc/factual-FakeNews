@@ -68,7 +68,7 @@ pathtools==0.1.2
 pep517==0.8.2
 pexpect==4.8.0
 pickleshare==0.7.5
-Pillow==8.0.1
+Pillow==10.2.0
 progress==1.5
 prometheus-client==0.8.0
 promise==2.3
@@ -116,7 +116,7 @@ torchvision==0.8.1
 tornado==6.1
 tqdm==4.51.0
 traitlets==5.0.5
-transformers==3.5.1
+transformers==4.37.0
 typing-extensions==3.7.4.3
 tzlocal==2.1
 urllib3==1.26.2
